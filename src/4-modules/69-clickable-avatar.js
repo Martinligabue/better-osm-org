@@ -10,30 +10,24 @@ function setupClickableAvatar() {
         e.preventDefault()
         e.stopPropagation()
         e.stopImmediatePropagation()
-        if (location.pathname.match(/\/user\/.+\/history/)) {
-            const targetURL = document.querySelector('.dropdown-item[href^="/user/"]').getAttribute("href")
+
+        const baseURL = document.querySelector('.dropdown-item[href^="/user/"]').getAttribute("href")
+        const isHistoryPage = location.pathname.match(/\/user\/.+\/history/)
+        const targetURL = isHistoryPage ? baseURL : baseURL + "/history"
+
+        if (targetURL !== location.pathname) {
             if (e.ctrlKey || e.metaKey) {
                 window.open(targetURL, "_blank")
             } else {
-                window.location.pathname = targetURL
-            }
-            miniAvatar.click() // dirty hack for hide dropdown
-        } else {
-            const targetURL = document.querySelector('.dropdown-item[href^="/user/"]').getAttribute("href") + "/history"
-            if (targetURL !== location.pathname) {
-                if (e.ctrlKey || e.metaKey) {
-                    window.open(targetURL, "_blank")
-                } else {
-                    try {
-                        getWindow().OSM.router.route(targetURL)
-                    } catch {
-                        window.location.pathname = targetURL
-                    }
+                try {
+                    if (!isHistoryPage) getWindow().OSM.router.route(targetURL)
+                        else throw "direct"
+                } catch {
+                    window.location.pathname = targetURL
                 }
-                miniAvatar.click() // dirty hack for hide dropdown
             }
         }
-    }
+        miniAvatar.click()
 }
 
 //</editor-fold>
